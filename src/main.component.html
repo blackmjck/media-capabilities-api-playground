@@ -1,0 +1,205 @@
+@if (isSupported) {
+<form [formGroup]="form">
+  <mat-card appearance="outlined">
+    <mat-card-header>
+      <mat-card-title>Media Capabilities API</mat-card-title>
+    </mat-card-header>
+    <mat-divider></mat-divider>
+    <mat-card-content>
+      <p>Check the browser support for your favorite audio or video formats.</p>
+      <p>
+        Which would you like to check?
+        <mat-button-toggle-group name="type" formControlName="type">
+          <mat-button-toggle value="audio">Audio</mat-button-toggle>
+          <mat-button-toggle value="video">Video</mat-button-toggle>
+        </mat-button-toggle-group>
+      </p>
+
+      @if(type === 'audio') {
+      <fieldset class="audio" formGroupName="audio">
+        <mat-form-field appearance="outline">
+          <mat-label>Content Type</mat-label>
+          <mat-select formControlName="contentType">
+            @for(opt of options.audio.contentType; track opt) {
+            <mat-option [value]="opt">{{ opt }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Channels</mat-label>
+          <mat-select formControlName="channels">
+            <mat-option value="2">2 (Stereo)</mat-option>
+            <mat-option value="1">1 (Mono)</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Bitrate</mat-label>
+          <mat-select formControlName="bitrate">
+            @for(rate of options.audio.bitrate; track rate) {
+            <mat-option [value]="rate">{{ rate / 1000 }} kbps</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Sample rate</mat-label>
+          <mat-select formControlName="samplerate">
+            @for(rate of options.audio.samplerate; track rate) {
+            <mat-option [value]="rate">{{ rate }}/sec</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </fieldset>
+      } @if(type === 'video') {
+      <fieldset class="video" formGroupName="video">
+        <mat-form-field appearance="outline">
+          <mat-label>Type/Codec</mat-label>
+          <mat-select formControlName="codec">
+            @for(codec of options.video.codec; track codec) {
+            <mat-option [value]="codec">{{ codec }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Size</mat-label>
+          <mat-select formControlName="size">
+            @for(dims of options.video.size; track dims) {
+            <mat-option [value]="dims">{{ dims }} px</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Framerate</mat-label>
+          <mat-select formControlName="framerate">
+            @for(rate of options.video.framerate; track rate) {
+            <mat-option [value]="rate">{{ rate }} fps</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Bitrate</mat-label>
+          <mat-select formControlName="bitrate">
+            @for(rate of options.video.bitrate; track rate) {
+            <mat-option [value]="rate">{{ rate / 1000 }} kbps</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </fieldset>
+      }
+    </mat-card-content>
+
+    @if (type.length) {
+    <mat-card-actions>
+      <button mat-flat-button (click)="test()" [disabled]="!canTest">
+        Test {{ type === 'audio' ? 'Audio' : 'Video' }} Configuration
+      </button>
+    </mat-card-actions>
+    }
+  </mat-card>
+</form>
+
+@if(testResults.length) {
+<section class="results-list">
+  <h3>Test Results ({{ testResults.length }})</h3>
+  <mat-divider></mat-divider>
+
+  @for(res of testResults; track res) {
+  <mat-card appearance="outlined">
+    <mat-card-header ngClass="res.type">
+      <mat-icon mat-card-avatar>{{
+        res.type === 'audio' ? 'music_note' : 'movie'
+      }}</mat-icon>
+      <mat-card-title>{{ res.type }}</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <section class="config">
+        <mat-list>
+          @if(res.type === 'audio') {
+          <mat-list-item>
+            <strong>Content type:</strong> {{ res.config.audio!.contentType }}
+          </mat-list-item>
+          <mat-list-item>
+            <strong>Channels:</strong>
+            {{ res.config.audio!.channels === '2' ? '2 (Stereo)' : '1 (Mono)' }}
+          </mat-list-item>
+          <mat-list-item>
+            <strong>Bitrate:</strong>
+            {{ res.config.audio!.bitrate! / 1000 }} kbps
+          </mat-list-item>
+          <mat-list-item>
+            <strong>Sample rate:</strong>
+            {{ res.config.audio!.samplerate }}/sec
+          </mat-list-item>
+          } @else {
+          <mat-list-item>
+            <strong>Codec:</strong> {{ res.config.video!.contentType }}
+          </mat-list-item>
+          <mat-list-item>
+            <strong>Size:</strong> {{ res.config.video!.width }}x{{
+              res.config.video!.height
+            }}
+          </mat-list-item>
+          <mat-list-item>
+            <strong>Framerate:</strong> {{ res.config.video!.framerate }} fps
+          </mat-list-item>
+          <mat-list-item>
+            <strong>Bitrate:</strong>
+            {{ res.config.video!.bitrate! / 1000 }} kbps
+          </mat-list-item>
+          }
+        </mat-list>
+      </section>
+      <section class="results">
+        <mat-list>
+          <mat-list-item class.success="res.results.supported">
+            <strong matListItemTitle>Supported?</strong>
+            <span matListItemMeta>
+              <mat-icon [color]="res.results.supported ? 'primary' : 'warn'">{{
+                res.results.supported ? 'check' : 'close'
+              }}</mat-icon></span
+            >
+          </mat-list-item>
+          <mat-list-item class.success="res.results.smooth">
+            <strong matListItemTitle>Smooth?</strong>
+            <span matListItemMeta>
+              <mat-icon [color]="res.results.smooth ? 'primary' : 'warn'">{{
+                res.results.smooth ? 'check' : 'close'
+              }}</mat-icon></span
+            >
+          </mat-list-item>
+          <mat-list-item class.success="res.results.powerEfficient">
+            <strong matListItemTitle>Power efficient?</strong>
+            <span matListItemMeta>
+              <mat-icon
+                [color]="res.results.powerEfficient ? 'primary' : 'warn'"
+                >{{ res.results.powerEfficient ? 'check' : 'close' }}</mat-icon
+              ></span
+            >
+          </mat-list-item>
+        </mat-list>
+      </section>
+    </mat-card-content>
+  </mat-card>
+  }
+</section>
+} } @else {
+<mat-card appearance="outlined">
+  <mat-card-content>
+    <p>
+      Alas, the
+      <a
+        href="https://developer.mozilla.org/en-US/docs/Web/API/Media_Capabilities_API"
+        target="_blank"
+        >Media Capabilities API</a
+      >
+      is not available in your current browser.
+    </p>
+  </mat-card-content>
+</mat-card>
+}

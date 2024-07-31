@@ -1,0 +1,65 @@
+mat-divider {
+  margin: 1rem 0;
+}
+
+mat-card-content,
+fieldset {
+  display: flex;
+  flex-direction: column;
+}
+
+fieldset {
+  border: none;
+  padding: 0;
+}
+
+mat-card-content.centered {
+  align-items: center;
+  justify-content: center;
+}
+
+mat-card + mat-card {
+  margin-top: 1rem;
+}
+
+mat-card-content mat-form-field {
+  flex-grow: 1;
+}
+
+mat-card-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin: 0.5rem;
+}
+
+mat-card-actions span {
+  flex-grow: 3;
+}
+
+mat-card-actions mat-form-field {
+  flex-grow: 2;
+}
+
+mat-card-actions ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+  display: none !important;
+}
+
+section.results-list {
+  margin-top: 2.5rem;
+}
+.results-list h3 {
+  font-size: 1.75rem;
+}
+.results-list mat-divider {
+  margin: 1rem -2rem 1.5rem;
+}
+.results-list mat-card mat-card-content {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+.results-list mat-card mat-card-content .results {
+  
+}
